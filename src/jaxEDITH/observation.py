@@ -49,7 +49,7 @@ def calc_exptime_from_observation(
     :func:`jaxEDITH.calc_exptime`.
 
     Args:
-        optical_path: coronagraphoto ``OpticalPath`` equinox module.
+        optical_path: ``optixstuff.OpticalPath`` equinox module.
         observatory: orbix ``ObservatoryL2Halo`` instance.
         mjd: Observation time (Modified Julian Date).
         ra_rad: Target right ascension in radians (J2000).
@@ -129,7 +129,7 @@ def calc_snr_from_observation(
     given a fixed observation time.
 
     Args:
-        optical_path: coronagraphoto ``OpticalPath`` equinox module.
+        optical_path: ``optixstuff.OpticalPath`` equinox module.
         observatory: orbix ``ObservatoryL2Halo`` instance.
         mjd: Observation time (Modified Julian Date).
         ra_rad: Target right ascension in radians (J2000).
@@ -301,7 +301,7 @@ def calc_exptime_from_system(
     observatory geometry.
 
     Args:
-        optical_path: coronagraphoto ``OpticalPath`` equinox module.
+        optical_path: ``optixstuff.OpticalPath`` equinox module.
         system: ``exoverses.jax.System`` with star + planets.
         planet_index: Index of the target planet in the System.
         observatory: orbix ``ObservatoryL2Halo`` instance.
@@ -376,7 +376,7 @@ def calc_snr_from_system(
     given a fixed observation time.
 
     Args:
-        optical_path: coronagraphoto ``OpticalPath`` equinox module.
+        optical_path: ``optixstuff.OpticalPath`` equinox module.
         system: ``exoverses.jax.System`` with star + planets.
         planet_index: Index of the target planet in the System.
         observatory: orbix ``ObservatoryL2Halo`` instance.

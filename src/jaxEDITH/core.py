@@ -1,10 +1,10 @@
 """JAX ETC -- core orchestration functions.
 
 This module contains the main user-facing functions for the JAX exposure time
-calculator. It bridges :mod:`coronagraphoto` hardware objects and astrophysical
+calculator. It bridges :mod:`optixstuff` hardware objects and astrophysical
 scene parameters to the pure-JAX count-rate and solver functions.
 
-All public functions accept coronagraphoto ``OpticalPath`` and ``ETCScene``
+All public functions accept ``optixstuff.OpticalPath`` and ``ETCScene``
 eqx.Modules directly, making the entire pipeline JIT-able end-to-end via
 ``eqx.filter_jit``.
 """
@@ -108,7 +108,7 @@ def _compute_count_rates(
     JIT-traceable.
 
     Args:
-        optical_path: coronagraphoto ``OpticalPath`` eqx.Module.
+        optical_path: ``optixstuff.OpticalPath`` eqx.Module.
         scene: :class:`ETCScene` instance.
         wavelength_nm: Observation wavelength [nm].
         separation_lod: Planet separation in lam/D.
@@ -127,14 +127,14 @@ def _compute_count_rates(
 
     # Telescope
     area_m2 = primary.area_m2
-    throughput = optical_path.calculate_combined_attenuation(wavelength_nm)
+    throughput = optical_path.system_throughput(wavelength_nm)
 
     # Coronagraph performance (interpax splines, fully JIT-safe)
-    core_throughput = coro.throughput(separation_lod)
-    core_area_lod2 = coro.core_area(separation_lod)
-    sky_trans = coro.occulter_transmission(separation_lod)
-    core_mean_intensity = coro.core_mean_intensity(separation_lod)
-    noisefloor_value = coro.noise_floor_ayo(separation_lod)
+    core_throughput = coro.throughput(separation_lod, wavelength_nm)
+    core_area_lod2 = coro.core_area(separation_lod, wavelength_nm)
+    sky_trans = coro.occulter_transmission(separation_lod, wavelength_nm)
+    core_mean_intensity_val = coro.core_mean_intensity(separation_lod, wavelength_nm)
+    noisefloor_value = core_mean_intensity_val / config.ppfact
 
     # Angular scales
     lam_m = wavelength_nm * nm2m
@@ -142,8 +142,8 @@ def _compute_count_rates(
     lod_arcsec = lod_rad * rad2arcsec
 
     # Detector-derived quantities
-    pixscale_lod = detector.pixel_scale
-    n_pix = core_area_lod2 / (pixscale_lod**2) * detector.npix_multiplier
+    pixscale_lod = coro.pixel_scale_lod
+    n_pix = core_area_lod2 / (pixscale_lod**2) * config.npix_multiplier
 
     # Planet signal
     Cp = count_rate_planet(
@@ -166,7 +166,7 @@ def _compute_count_rates(
         dlambda_nm,
         scene.n_channels,
         core_area_lod2,
-        core_mean_intensity,
+        core_mean_intensity_val,
     )
 
     # Zodiacal light
@@ -228,7 +228,7 @@ def _compute_count_rates(
     CRbd = count_rate_detector(
         n_pix,
         detector.dark_current_rate,
-        detector.read_noise,
+        detector.read_noise_electrons,
         detector.read_time,
         detector.cic_rate,
         t_photon,
@@ -278,7 +278,7 @@ def calc_exptime(
     via ``eqx.filter_jit``.
 
     Args:
-        optical_path: coronagraphoto ``OpticalPath`` eqx.Module containing
+        optical_path: ``optixstuff.OpticalPath`` eqx.Module containing
             primary, coronagraph, attenuating elements, and detector.
         scene: :class:`ETCScene` instance with astrophysical parameters.
         wavelength_nm: Observation wavelength [nm].
@@ -321,7 +321,7 @@ def calc_snr(
     """Calculate achieved SNR for a given observation time.
 
     Args:
-        optical_path: coronagraphoto ``OpticalPath`` eqx.Module.
+        optical_path: ``optixstuff.OpticalPath`` eqx.Module.
         scene: :class:`ETCScene` instance with astrophysical parameters.
         wavelength_nm: Observation wavelength [nm].
         separation_lod: Planet separation in lam/D.
@@ -367,7 +367,7 @@ def calc_count_rates(
     jaxEDITH/AYO/EXOSIMS values.
 
     Args:
-        optical_path: coronagraphoto ``OpticalPath`` eqx.Module.
+        optical_path: ``optixstuff.OpticalPath`` eqx.Module.
         scene: :class:`ETCScene` instance.
         wavelength_nm: Observation wavelength [nm].
         separation_lod: Planet separation in lam/D.
@@ -412,7 +412,7 @@ def calc_exptime_spectrum(
     is JIT-traceable via ``eqx.filter_jit``.
 
     Args:
-        optical_path: coronagraphoto ``OpticalPath`` eqx.Module.
+        optical_path: ``optixstuff.OpticalPath`` eqx.Module.
         scene: :class:`ETCScene` instance. ``F0`` and ``Fs_over_F0`` should
             be 1D arrays of the same length as ``wavelength_array_nm``.
         wavelength_array_nm: Array of wavelengths [nm].

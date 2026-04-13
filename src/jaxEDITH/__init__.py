@@ -1,16 +1,16 @@
-"""JAX ETC — public API.
+"""JAX ETC -- public API.
 
 This module provides the main user-facing functions for the JAX exposure time
-calculator. It bridges :mod:`coronagraphoto` hardware objects (stored as
+calculator. It bridges :mod:`optixstuff` hardware objects (stored as
 equinox modules) and astrophysical scene parameters to the pure-JAX count-rate
 and solver functions.
 
 Example:
 -------
->>> from coronagraphoto import OpticalPath
+>>> from optixstuff import OpticalPath
 >>> from jaxEDITH import calc_exptime, CONFIG
 >>>
->>> # Build optical_path from coronagraphoto objects
+>>> # Build optical_path from optixstuff objects
 >>> optical_path = OpticalPath(primary=..., coronagraph=..., detector=...)
 >>> scene = ETCScene(F0=..., Fs_over_F0=..., Fp_over_Fs=..., ...)
 >>>

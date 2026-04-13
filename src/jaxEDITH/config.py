@@ -34,6 +34,8 @@ class ETCConfig(eqx.Module):
         n_rolls: Number of telescope rolls.
         include_exozodi_noise_floor: Whether the exozodi noise floor is
             included (jaxEDITH extension).
+        npix_multiplier: Pixel count correction factor for the photometric
+            aperture.  ETC-specific, not a hardware property.
     """
 
     # --- Solver variant (trace-time dispatch) ---
@@ -51,6 +53,9 @@ class ETCConfig(eqx.Module):
 
     # --- Exozodi noise floor (jaxEDITH extension) ---
     include_exozodi_noise_floor: bool = True
+
+    # --- Aperture correction ---
+    npix_multiplier: float = 1.0
 
 
 # ---------------------------------------------------------------------------
