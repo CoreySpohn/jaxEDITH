@@ -28,7 +28,7 @@ docs = [
     "ipython",
     "matplotlib",
 ]
-test = ["nox", "pytest", "hypothesis", "pytest-cov"]
+test = ["nox", "pytest", "hypothesis", "pytest-cov", "orbix"]
 
 [project.urls]
 Homepage = "https://github.com/CoreySpohn/jaxEDITH"
