@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.2](https://github.com/CoreySpohn/jaxedith/compare/v0.0.1...v0.0.2) (2026-04-13)
+
+
+### Miscellaneous Chores
+
+* release 0.0.2 ([0403b67](https://github.com/CoreySpohn/jaxedith/commit/0403b67df165274c5a31468e4c8a113c49650adf))
+
 ## 0.0.1 (2026-04-13)
 
 
